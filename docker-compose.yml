@@ -1,0 +1,16 @@
+version: '3'
+services:
+  postgres-development:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bukure-development
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    ports:
+      - 15432:5432
+
+volumes:
+  postgres-data:
+    driver: local
