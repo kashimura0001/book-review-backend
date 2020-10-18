@@ -14,7 +14,7 @@ development:
 test:
   <<: *default
   host: localhost
-  database: bukure_test
+  database: bukure-test
   username: root
   password: password
   port: 15432
