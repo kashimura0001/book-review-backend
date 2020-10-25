@@ -5,6 +5,7 @@ ruby '2.6.4'
 
 gem 'bootsnap', '>= 1.4.2', require: false
 gem 'graphql', '1.9.17'
+gem 'jwt'
 gem 'pg', '>= 0.18', '< 2.0'
 gem 'puma', '~> 4.1'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.4'

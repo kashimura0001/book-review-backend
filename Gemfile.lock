@@ -78,6 +78,7 @@ GEM
     graphql (1.9.17)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
+    jwt (2.2.2)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -179,6 +180,7 @@ DEPENDENCIES
   factory_bot_rails
   graphiql-rails (= 1.7.0)
   graphql (= 1.9.17)
+  jwt
   listen (~> 3.2)
   pg (>= 0.18, < 2.0)
   puma (~> 4.1)
