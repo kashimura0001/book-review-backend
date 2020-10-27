@@ -35,55 +35,57 @@ module FirebaseHelper
           decoded_token: decoded_token
         }
       end
-    end
 
-    private
+      private
 
-    def decode_jwt(token, key = nil, verify = false, options = {})
-      begin
-        decoded_token = JWT.decode(token, key, verify, options)
-      rescue JWT::ExpiredSignature => e
-        raise 'Firebase ID token has expired. Get a fresh token your client app and try again.'
-      rescue StandardError => e
-        raise "Firebase ID token has invalid signature. #{e.message}"
+      def decode_jwt(token, key = nil, verify = false, options = {})
+        begin
+          decoded_token = JWT.decode(token, key, verify, options)
+        rescue JWT::ExpiredSignature => e
+          raise 'Firebase ID token has expired. Get a fresh token your client app and try again.'
+        rescue StandardError => e
+          raise "Firebase ID token has invalid signature. #{e.message}"
+        end
+
+        {
+          payload: decoded_token[0],
+          header: decoded_token[1]
+        }
       end
 
-      {
-        payload: decoded_token[0],
-        header: decoded_token[1]
-      }
-    end
+      def fetch_public_keys
+        uri = URI.parse(CLIENT_CERT_URL)
+        https = Net::HTTP.new(uri.host, uri.port)
+        https.use_ssl = true
 
-    def fetch_public_keys
-      uri = URI.parse(CLIENT_CERT_URL)
-      https = Net::HTTP.new(uri.host, uri.port)
-      https.use_ssl = true
+        res = https.start do
+          https.get(uri.request_uri)
+        end
+        data = JSON.parse(res.body)
+        if data['error'] && data['error_description']
+          raise "Error fetching public keys for Google certs: #{data['error']} (#{res['error_description']})"
+        end
 
-      res = https.start do
-        https.get(uri.request_uri)
-      end
-      data = JSON.parse(res.body)
-      if data['error'] && data['error_description']
-        raise "Error fetching public keys for Google certs: #{data['error']} (#{res['error_description']})"
+        data
       end
 
-      data
-    end
+      def validate(json)
+        errors     = []
+        project_id = FirebaseHelper::CONFIG['project_info']['project_id']
+        payload    = json[:payload]
+        header     = json[:header]
+        issuer     = ISSUER_BASE_URL + project_id
 
-    def validate(json)
-      errors     = []
-      project_id = FirebaseHelper::CONFIG['project_info']['project_id']
-      payload    = json[:payload]
-      header     = json[:header]
-      issuer     = ISSUER_BASE_URL + project_id
+        unless header['kid']                then errors << %(Firebase ID token has no "kid" claim.) end
+        unless header['alg']  == ALGORITHM  then errors << %(Firebase ID token has incorrect algorithm. Expected "#{ALGORITHM}" but got "#{header['alg']}".) end
+        unless payload['aud'] == project_id then errors << %(Firebase ID token has incorrect aud (audience) claim. Expected "#{project_id}" but got "#{payload['aud']}".) end
+        unless payload['iss'] == issuer     then errors << %(Firebase ID token has incorrect "iss" (issuer) claim. Expected "#{issuer}" but got "#{payload['iss']}".) end
+        unless payload['sub'].is_a?(String) then errors << %(Firebase ID token has no "sub" (subject) claim.) end
+        if     payload['sub'].empty?        then errors << %(Firebase ID token has an empty string "sub" (subject) claim.) end
+        if     payload['sub'].size > 128    then errors << %(Firebase ID token has "sub" (subject) claim longer than 128 characters.) end
 
-      unless header['kid']                then errors << %(Firebase ID token has no "kid" claim.) end
-      unless header['alg']  == ALGORITHM  then errors << %(Firebase ID token has incorrect algorithm. Expected "#{ALGORITHM}" but got "#{header['alg']}".) end
-      unless payload['aud'] == project_id then errors << %(Firebase ID token has incorrect aud (audience) claim. Expected "#{project_id}" but got "#{payload['aud']}".) end
-      unless payload['iss'] == issuer     then errors << %(Firebase ID token has incorrect "iss" (issuer) claim. Expected "#{issuer}" but got "#{payload['iss']}".) end
-      unless payload['sub'].is_a?(String) then errors << %(Firebase ID token has no "sub" (subject) claim.) end
-      if     payload['sub'].empty?        then errors << %(Firebase ID token has an empty string "sub" (subject) claim.) end
-      if     payload['sub'].size > 128    then errors << %(Firebase ID token has "sub" (subject) claim longer than 128 characters.) end
+        errors
+      end
     end
   end
 end
