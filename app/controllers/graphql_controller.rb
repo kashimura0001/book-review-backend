@@ -5,12 +5,17 @@ class GraphqlController < ApplicationController
   # protect_from_forgery with: :null_session
 
   def execute
+    raise 'Firebase ID token is not set' if request.headers['Authorization'].blank?
+
+    token = request.headers['Authorization'].split(' ').last
+    decoded_token = FirebaseHelper::Auth.verify_id_token(token)
+
     variables = ensure_hash(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      # Query context goes here, for example:
-      # current_user: current_user,
+      decoded_token: decoded_token,
+      current_user: User.find_by(uuid: decoded_token['uid'])
     }
     result = BukureBackendSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
