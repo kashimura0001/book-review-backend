@@ -15,7 +15,7 @@ class GraphqlController < ApplicationController
     operation_name = params[:operationName]
     context = {
       decoded_token: decoded_token,
-      current_user: User.find_by(uuid: decoded_token['uid'])
+      current_user: User.find_by(uuid: decoded_token[:uid])
     }
     result = BukureBackendSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result

@@ -8,7 +8,7 @@ module Mutations
 
     def resolve(name: nil, email: nil)
       user = User.create!(
-        uuid: context[:decoded_token]['uid'],
+        uuid: context[:decoded_token][:uid],
         name: name,
         email: email
       )
