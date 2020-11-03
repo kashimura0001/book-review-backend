@@ -7,6 +7,8 @@ module Mutations
     field :user, Types::UserType, null: false
 
     def resolve(name: nil, email: nil)
+      return unless context[:decoded_token]
+
       user = User.create!(
         uuid: context[:decoded_token][:uid],
         name: name,
