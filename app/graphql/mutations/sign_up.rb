@@ -1,16 +1,16 @@
 module Mutations
-  class CreateUser < BaseMutation
+  class SignUp < BaseMutation
 
+    argument :token, String, required: true
     argument :name, String, required: true
     argument :email, String, required: true
 
     field :user, Types::UserType, null: false
 
     def resolve(name: nil, email: nil)
-      return unless context[:decoded_token]
-
+      decoded_token = FirebaseHelper::Auth.verify_id_token(token)
       user = User.create!(
-        uuid: context[:decoded_token][:uid],
+        uuid: decoded_token.uid,
         name: name,
         email: email
       )

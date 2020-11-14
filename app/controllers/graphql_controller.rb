@@ -1,33 +1,19 @@
 class GraphqlController < ApplicationController
-  # If accessing from outside this domain, nullify the session
-  # This allows for outside API access while preventing CSRF attacks,
-  # but you'll have to authenticate your user separately
-  # protect_from_forgery with: :null_session
 
   def execute
-    decoded_token = nil
-    if request.headers['Authorization'].present?
-      token = request.headers['Authorization'].split(' ').last
-      decoded_token = FirebaseHelper::Auth.verify_id_token(token)
-    end
-
     variables = ensure_hash(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    context = {
-      decoded_token: decoded_token,
-      current_user: decoded_token ? User.find_by(uuid: decoded_token[:uid]) : nil
-    }
+    context = { current_user: need_sign_in?(query) ? current_user : nil }
     result = BukureBackendSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
-  rescue => e
+  rescue StandardError => e
     raise e unless Rails.env.development?
     handle_error_in_development e
   end
 
   private
 
-  # Handle form data, JSON body, or a blank value
   def ensure_hash(ambiguous_param)
     case ambiguous_param
     when String
@@ -43,6 +29,39 @@ class GraphqlController < ApplicationController
     else
       raise ArgumentError, "Unexpected parameter: #{ambiguous_param}"
     end
+  end
+
+  def need_sign_in?(query)
+    parsed_document = parse_to_document(query)
+    operation_defs = parsed_document.definitions.select do |d|
+      d.is_a?(GraphQL::Language::Nodes::OperationDefinition)
+    end
+
+    is_needed = false
+    no_needed_operation_names = %w[
+      signUp
+    ]
+
+    operation_defs.each do |operation_def|
+      is_needed = true if operation_def.selections.find { |s| no_needed_operation_names.exclude?(s.name) }
+    end
+
+    is_needed
+  end
+
+  def parse_to_document(query)
+    raise GraphQL::ParseError.new('GraphQL document must have one or more definitions', nil, nil, query) if query.blank?
+
+    GraphQL.parse(query)
+  end
+
+  # Authentication
+  def current_user
+    raise 'Authorization token is empty' if request.headers['Authorization'].blank?
+
+    token = request.headers['Authorization'].split(' ').last
+    decoded_token = FirebaseHelper::Auth.verify_id_token(token)
+    decoded_token ? User.find_by(uuid: decoded_token[:uid]) : nil
   end
 
   def handle_error_in_development(e)

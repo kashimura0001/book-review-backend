@@ -19,6 +19,7 @@ group :development do
   gem 'factory_bot_rails'
   gem 'graphiql-rails', '1.7.0'
   gem 'listen', '~> 3.2'
+  gem 'pry-rails'
   gem 'rspec-rails'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
