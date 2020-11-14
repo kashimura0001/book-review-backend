@@ -7,10 +7,10 @@ module Mutations
 
     field :user, Types::UserType, null: false
 
-    def resolve(name: nil, email: nil)
+    def resolve(token: nil, name: nil, email: nil)
       decoded_token = FirebaseHelper::Auth.verify_id_token(token)
       user = User.create!(
-        uuid: decoded_token.uid,
+        uuid: decoded_token[:uid],
         name: name,
         email: email
       )
