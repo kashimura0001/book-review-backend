@@ -1,5 +1,5 @@
 module Mutations
-  class SignUp < BaseMutation
+  class CreateUser < BaseMutation
 
     argument :token, String, required: true
     argument :name, String, required: true

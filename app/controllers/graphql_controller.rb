@@ -39,7 +39,7 @@ class GraphqlController < ApplicationController
 
     is_needed = false
     no_needed_operation_names = %w[
-      signUp
+      createUser
     ]
 
     operation_defs.each do |operation_def|
