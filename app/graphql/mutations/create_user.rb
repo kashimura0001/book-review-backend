@@ -7,15 +7,15 @@ module Mutations
 
     field :user, Types::UserType, null: false
 
-    def resolve(token: nil, name: nil, email: nil)
+    def resolve(token:, name:, email:)
       decoded_token = FirebaseHelper::Auth.verify_id_token(token)
-      user = User.create!(
-        uuid: decoded_token[:uid],
-        name: name,
-        email: email
-      )
+      operation = CreateUserOperation.new(uid: decoded_token[:uid], name: name, email: email)
 
-      { user: user }
+      return { user: operation.user } if operation.call
+
+      raise ActiveRecord::ValidationError if operation.error.present?
+
+      raise "Unexpected operation error. error: #{operation.error}"
     end
   end
 end
