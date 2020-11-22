@@ -1,0 +1,33 @@
+require: rubocop-performance
+
+AllCops:
+  TargetRubyVersion: 2.6.4
+  DisplayCopNames: true
+  Exclude:
+    - bin/*
+    - config/environments/**/*
+    - config/*.rb
+    - db/**/*
+
+Metrics/LineLength:
+  Max: 120
+  Exclude:
+    - db/**/*
+
+Style/Documentation:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
