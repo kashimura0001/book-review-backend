@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  validates :uuid, presence: true, uniqueness: true
+  validates :firebase_uid, presence: true, uniqueness: true
   validates :name, presence: true
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true
 end
