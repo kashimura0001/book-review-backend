@@ -1,8 +1,8 @@
 class CreateUserOperation < ApplicationOperation
   attr_reader :user
 
-  def initialize(uid:, name:, email:)
-    @contract = CreateUserContract.new(uid: uid, name: name, email: email)
+  def initialize(firebase_uid:, name:, email:)
+    @contract = CreateUserContract.new(firebase_uid: firebase_uid, name: name, email: email)
   end
 
   def call
@@ -12,7 +12,7 @@ class CreateUserOperation < ApplicationOperation
     end
 
     user = User.create!(
-      uuid: @contract.uid,
+      firebase_uid: @contract.firebase_uid,
       name: @contract.name,
       email: @contract.email
     )

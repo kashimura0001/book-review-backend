@@ -9,7 +9,7 @@ module Mutations
 
     def resolve(token:, name:, email:)
       decoded_token = FirebaseHelper::Auth.verify_id_token(token)
-      operation = CreateUserOperation.new(uid: decoded_token[:uid], name: name, email: email)
+      operation = CreateUserOperation.new(firebase_uid: decoded_token[:uid], name: name, email: email)
 
       return { user: operation.user } if operation.call
 
