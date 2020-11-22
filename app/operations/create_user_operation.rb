@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUserOperation < ApplicationOperation
   attr_reader :user
 

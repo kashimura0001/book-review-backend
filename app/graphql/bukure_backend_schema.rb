@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BukureBackendSchema < GraphQL::Schema
   use GraphQL::Execution::Interpreter
   use GraphQL::Analysis::AST

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUserContract < ApplicationContract
   attribute :firebase_uid
   attribute :name

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationOperation
   ERROR_CONTRACT_VALIDATION = :error_contract_validation
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GraphqlController < ApplicationController
 
   def execute
@@ -50,16 +52,16 @@ class GraphqlController < ApplicationController
   end
 
   def parse_to_document(query)
-    raise GraphQL::ParseError.new('GraphQL document must have one or more definitions', nil, nil, query) if query.blank?
+    raise GraphQL::ParseError.new("GraphQL document must have one or more definitions", nil, nil, query) if query.blank?
 
     GraphQL.parse(query)
   end
 
   # Authentication
   def current_user
-    raise 'Authorization token is empty' if request.headers['Authorization'].blank?
+    raise "Authorization token is empty" if request.headers["Authorization"].blank?
 
-    token = request.headers['Authorization'].split(' ').last
+    token = request.headers["Authorization"].split(" ").last
     decoded_token = FirebaseHelper::Auth.verify_id_token(token)
     decoded_token ? User.find_by(uuid: decoded_token[:uid]) : nil
   end
