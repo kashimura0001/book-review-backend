@@ -6,7 +6,7 @@ class GraphqlController < ApplicationController
     variables = ensure_hash(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    context = { current_user: need_sign_in?(query) ? current_user : nil }
+    context = { current_user: auth_free?(query) ? nil : current_user }
     result = BukureBackendSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
   rescue StandardError => e
@@ -33,28 +33,23 @@ class GraphqlController < ApplicationController
     end
   end
 
-  def need_sign_in?(query)
-    parsed_document = parse_to_document(query)
-    operation_defs = parsed_document.definitions.select do |d|
-      d.is_a?(GraphQL::Language::Nodes::OperationDefinition)
+  def auth_free?(query)
+    if query.blank?
+      raise GraphQL::ParseError.new("GraphQL document must have one or more definitions", nil, nil, query)
     end
 
-    is_needed = false
-    no_needed_operation_names = %w[
+    parsed_query = GraphQL.parse(query)
+    operations = parsed_query.definitions.select { |q| q.is_a?(GraphQL::Language::Nodes::OperationDefinition) }
+
+    auth_free_operation_names = %w[
       createUser
     ]
 
-    operation_defs.each do |operation_def|
-      is_needed = true if operation_def.selections.find { |s| no_needed_operation_names.exclude?(s.name) }
+    operations.each do |operation|
+      return true if operation.selections.find { |o| auth_free_operation_names.include?(o.name) }
     end
 
-    is_needed
-  end
-
-  def parse_to_document(query)
-    raise GraphQL::ParseError.new("GraphQL document must have one or more definitions", nil, nil, query) if query.blank?
-
-    GraphQL.parse(query)
+    false
   end
 
   # Authentication
@@ -63,7 +58,7 @@ class GraphqlController < ApplicationController
 
     token = request.headers["Authorization"].split(" ").last
     decoded_token = FirebaseHelper::Auth.verify_id_token(token)
-    decoded_token ? User.find_by(uuid: decoded_token[:uid]) : nil
+    decoded_token ? User.with_firebase_uid(decoded_token[:uid]) : nil
   end
 
   def handle_error_in_development(e)
