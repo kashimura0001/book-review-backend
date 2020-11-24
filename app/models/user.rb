@@ -5,4 +5,6 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { maximum: 100 }
   validates :email, presence: true, uniqueness: true, length: { maximum: 255 }
   validates :avatar_url, length: { maximum: 255 }
+
+  scope :with_firebase_uid, ->(firebase_uid) { find_by(firebase_uid: firebase_uid) }
 end
