@@ -58,7 +58,7 @@ class GraphqlController < ApplicationController
 
     token = request.headers["Authorization"].split(" ").last
     decoded_token = FirebaseHelper::Auth.verify_id_token(token)
-    decoded_token ? User.with_firebase_uid(decoded_token[:uid]) : nil
+    decoded_token ? User.with_firebase_uid(firebase_uid: decoded_token[:uid]) : nil
   end
 
   def handle_error_in_development(e)
