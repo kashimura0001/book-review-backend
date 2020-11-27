@@ -46,10 +46,10 @@ class GraphqlController < ApplicationController
     ]
 
     operations.each do |operation|
-      return true if operation.selections.find { |o| auth_free_operation_names.include?(o.name) }
+      return false if operation.selections.find { |o| auth_free_operation_names.exclude?(o.name) }
     end
 
-    false
+    true
   end
 
   # Authentication
