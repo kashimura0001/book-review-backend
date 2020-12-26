@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :review do
-    organization { nil }
+    team { nil }
     user { nil }
     book { nil }
     title { "MyString" }

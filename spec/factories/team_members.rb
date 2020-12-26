@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :organization_member do
-    organization { nil }
+  factory :team_member do
+    team { nil }
     user { nil }
     role { 1 }
     invite_code { "MyString" }

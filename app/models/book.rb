@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Book < ApplicationRecord
-  belongs_to :organization
+  belongs_to :team
 
   validates :isbn, uniqueness: true, length: { maximum: 50 }
   validates :title, presence: true, length: { maximum: 255 }

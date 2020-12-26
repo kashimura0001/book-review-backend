@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_23_114901) do
+ActiveRecord::Schema.define(version: 2020_12_26_073230) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "books", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "organization_id", null: false
+    t.uuid "team_id", null: false
     t.string "isbn", limit: 50
     t.string "title", limit: 255, null: false
     t.string "author", limit: 255, null: false
@@ -25,11 +25,24 @@ ActiveRecord::Schema.define(version: 2020_11_23_114901) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["isbn"], name: "index_books_on_isbn", unique: true
-    t.index ["organization_id"], name: "index_books_on_organization_id"
+    t.index ["team_id"], name: "index_books_on_team_id"
   end
 
-  create_table "organization_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "organization_id", null: false
+  create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "team_id", null: false
+    t.uuid "user_id", null: false
+    t.uuid "book_id", null: false
+    t.string "title", limit: 100, null: false
+    t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["book_id"], name: "index_reviews_on_book_id"
+    t.index ["team_id"], name: "index_reviews_on_team_id"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
+  create_table "team_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "team_id", null: false
     t.uuid "user_id"
     t.integer "role", null: false
     t.string "invite_code", limit: 255
@@ -38,27 +51,14 @@ ActiveRecord::Schema.define(version: 2020_11_23_114901) do
     t.datetime "invite_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["organization_id"], name: "index_organization_members_on_organization_id"
-    t.index ["user_id"], name: "index_organization_members_on_user_id"
+    t.index ["team_id"], name: "index_team_members_on_team_id"
+    t.index ["user_id"], name: "index_team_members_on_user_id"
   end
 
-  create_table "organizations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "teams", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", limit: 50, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "reviews", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "organization_id", null: false
-    t.uuid "user_id", null: false
-    t.uuid "book_id", null: false
-    t.string "title", limit: 100, null: false
-    t.text "body", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["book_id"], name: "index_reviews_on_book_id"
-    t.index ["organization_id"], name: "index_reviews_on_organization_id"
-    t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -72,10 +72,10 @@ ActiveRecord::Schema.define(version: 2020_11_23_114901) do
     t.index ["firebase_uid"], name: "index_users_on_firebase_uid", unique: true
   end
 
-  add_foreign_key "books", "organizations"
-  add_foreign_key "organization_members", "organizations"
-  add_foreign_key "organization_members", "users"
+  add_foreign_key "books", "teams"
   add_foreign_key "reviews", "books"
-  add_foreign_key "reviews", "organizations"
+  add_foreign_key "reviews", "teams"
   add_foreign_key "reviews", "users"
+  add_foreign_key "team_members", "teams"
+  add_foreign_key "team_members", "users"
 end

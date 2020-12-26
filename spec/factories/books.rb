@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :book do
-    organization { nil }
+    team { nil }
     isbn { "MyString" }
     title { "MyString" }
     author { "MyString" }
