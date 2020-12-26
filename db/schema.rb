@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_26_073230) do
+ActiveRecord::Schema.define(version: 2020_12_26_122322) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -20,8 +20,8 @@ ActiveRecord::Schema.define(version: 2020_12_26_073230) do
     t.uuid "team_id", null: false
     t.string "isbn", limit: 50
     t.string "title", limit: 255, null: false
-    t.string "author", limit: 255, null: false
-    t.string "image_url", limit: 255, null: false
+    t.string "author", limit: 255
+    t.string "image_url", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["isbn"], name: "index_books_on_isbn", unique: true
