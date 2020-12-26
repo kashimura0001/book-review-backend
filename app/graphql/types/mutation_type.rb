@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class MutationType < Types::BaseObject
+  class MutationType < ObjectTypes::BaseObject
     prefix_path = "app/graphql/mutations/"
     Dir.glob("#{prefix_path}*") do |filename|
       filename = filename.gsub(prefix_path, "")

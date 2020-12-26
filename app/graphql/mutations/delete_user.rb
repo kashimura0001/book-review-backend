@@ -3,7 +3,7 @@
 module Mutations
   class DeleteUser < BaseMutation
 
-    field :user, Types::UserType, null: false
+    field :user, ObjectTypes::UserType, null: false
 
     def resolve
       return unless context[:current_user]

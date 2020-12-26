@@ -7,7 +7,7 @@ module Mutations
     argument :name, String, required: true
     argument :email, String, required: true
 
-    field :user, Types::UserType, null: false
+    field :user, ObjectTypes::UserType, null: false
 
     def resolve(token:, name:, email:)
       decoded_token = FirebaseHelper::Auth.verify_id_token(token)

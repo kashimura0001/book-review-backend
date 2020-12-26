@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Types
+module InterfaceTypes
   module BaseInterface
     include GraphQL::Schema::Interface
 
-    field_class Types::BaseField
+    field_class FieldTypes::BaseField
   end
 end
