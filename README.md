@@ -1,6 +1,6 @@
-# Bukure backend
+※ unused
 
-## Setup
+# Setup
 ```
 $ bundle install
 $ docker-compose up -d
