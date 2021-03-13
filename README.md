@@ -1,5 +1,3 @@
-※ unused
-
 # Setup
 ```
 $ bundle install
